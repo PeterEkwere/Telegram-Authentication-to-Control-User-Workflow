@@ -17,8 +17,8 @@ load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app, origins=["https://wekopp45.com", "http://wekopp45.com", 
-                  "http://5.196.190.224:3000", "http://5.196.190.224", 
-                  "https://5.196.190.224"])
+                  "http://185.113.249.149:3000", "http://185.113.249.149", 
+                  "https://185.113.249.149"])
 
 # Get configuration from environment
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
