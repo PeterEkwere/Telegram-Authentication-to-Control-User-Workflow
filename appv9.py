@@ -16,7 +16,7 @@ load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app, origins=["https://wekopp45.com", "http://wekopp45.com", 
+CORS(app, origins=["https://verify.wekopp45.com", "http://verify.wekopp45.com", 
                   "http://185.113.249.149:3000", "http://185.113.249.149", 
                   "https://185.113.249.149"])
 
@@ -250,6 +250,8 @@ def notify():
     if available.decode() == "False":
         return jsonify({"available": False})
 
+    redis_client.set("service_available", "False")
+
     try:
         ip = request.remote_addr
         message = f"New User Visited!\nIP: {ip}\nLocation: {get_location(ip)}"
@@ -258,13 +260,17 @@ def notify():
         keyboard = []
         # Create rows of 2 buttons each
         commands_list = list(COMMANDS.keys())
-        for i in range(0, len(commands_list), 2):
-            row = []
-            for j in range(2):
-                if i + j < len(commands_list):
-                    cmd = commands_list[i + j]
-                    row.append({"text": cmd.replace("_", " "), "callback_data": cmd})
-            keyboard.append(row)
+
+        for cmd in commands_list:
+            # each row is now a single‑button list
+            keyboard.append([{
+                "text": cmd.replace("_", " "),
+                "callback_data": cmd
+                }])
+
+
+
+
 
         reply_markup = {
             "inline_keyboard": keyboard
@@ -276,7 +282,8 @@ def notify():
                 text=message,
                 reply_markup=reply_markup
             )
-            return jsonify({"status": "success"})
+            #return jsonify({"status": "success"})
+            return jsonify({"available": True})
         except TelegramError as e:
             print(f"Telegram error in notify: {e}")
             return jsonify({"status": "error", "message": str(e)}), 500
@@ -293,8 +300,8 @@ if __name__ == '__main__':
     bot_thread.start()
 
     # SSL certificate paths
-    key_path = '/etc/letsencrypt/live/wekopp45.com/privkey.pem'
-    cert_path = '/etc/letsencrypt/live/wekopp45.com/fullchain.pem'
+    key_path = '/etc/letsencrypt/live/verify.wekopp45.com/privkey.pem'
+    cert_path = '/etc/letsencrypt/live/verify.wekopp45.com/fullchain.pem'
     
     # Run Flask app
     app.run(host='0.0.0.0', port=5000, ssl_context=(cert_path, key_path))
